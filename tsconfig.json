@@ -1,0 +1,7 @@
+{
+	"compilerOptions": {
+		"baseUrl": "./",
+		"strictNullChecks": true,
+		"lib": ["ESNext", "DOM"]
+	}
+}
