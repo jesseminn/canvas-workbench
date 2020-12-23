@@ -1,7 +1,10 @@
 {
-	"compilerOptions": {
-		"baseUrl": "./",
-		"strictNullChecks": true,
-		"lib": ["ESNext", "DOM"]
-	}
+    "compilerOptions": {
+        "baseUrl": "./",
+        "strictNullChecks": true,
+        "lib": ["ESNext", "DOM"],
+        "target": "ESNext",
+        "module": "CommonJS",
+        "moduleResolution": "Node"
+    }
 }
