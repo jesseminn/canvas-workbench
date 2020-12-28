@@ -1,38 +1,58 @@
 import { Maybe, Callback } from '../types';
 
 export type CanvasElementOptions<T> = {
-    // information will be changed on every render
     draw: Draw<T>;
-    state?: T;
 };
 
-export type CanvasElementContext<T> = {
-    state: Maybe<T>;
-    cache: CanvasElementCache;
+export type CanvasElementContext = {
+    hook: CanvasElementHook;
 };
 
-export class CanvasElementCache {
-    private cache = new Map<string, any>();
+export class CanvasElementHook {
+    private registry = new Map<number, any>();
+    private index = 0;
+
+    private register<T>(value: T): [T, number] {
+        const index = this.incrementIndex();
+        let registeredValue: T;
+        if (this.registry.has(index)) {
+            registeredValue = this.registry.get(index);
+        } else {
+            this.registry.set(index, value);
+            registeredValue = value;
+        }
+        return [registeredValue, index];
+    }
+
+    private incrementIndex() {
+        this.index += 1;
+        return this.index;
+    }
+
+    resetIndex() {
+        this.index = 0;
+    }
+
+    state<T>(initialState: T): [T, Callback] {
+        const [state, index] = this.register(initialState);
+        const setState = <T>(newState: T) => {
+            this.registry.set(index, newState);
+        };
+        return [state, setState];
+    }
 
     callback<T extends Function>(callback: T) {
-        const key = callback.toString();
-
-        if (this.cache.has(key)) {
-            return this.cache.get(key) as T;
-        } else {
-            this.cache.set(key, callback);
-            return callback;
-        }
+        const [registeredValue] = this.register(callback);
+        return registeredValue;
     }
 
     memoize<R>(callback: Callback<R>) {
-        const key = callback.toString();
-
-        if (this.cache.has(key)) {
-            return this.cache.get(key);
+        const index = this.incrementIndex();
+        if (this.registry.has(index)) {
+            return this.registry.get(index);
         } else {
             const result = callback();
-            this.cache.set(key, result);
+            this.registry.set(index, result);
             return result;
         }
     }
@@ -41,32 +61,24 @@ export class CanvasElementCache {
 // export type Draw<T> = (ctx: CanvasRenderingContext2D, state: Maybe<T>) => T;
 export type Draw<T> = (
     canvasRenderingContext2D: CanvasRenderingContext2D,
-    canvasElementContext: CanvasElementContext<T>,
-) => Maybe<T>;
+    canvasElementContext: CanvasElementContext,
+) => void;
 
 export class CanvasElement<T = any> {
-    private state: Maybe<T> = null;
-    private cache = new CanvasElementCache();
+    private hook = new CanvasElementHook();
     private draw: Maybe<Draw<T>> = null;
 
     constructor(options: CanvasElementOptions<T>) {
-        const { state, draw } = options;
-
-        this.state = state;
+        const { draw } = options;
         this.draw = draw;
-    }
-
-    setState(state: Maybe<T>) {
-        this.state = state;
     }
 
     render(ctx: CanvasRenderingContext2D) {
         if (typeof this.draw === 'function') {
-            const newState = this.draw(ctx, {
-                state: this.state,
-                cache: this.cache,
+            this.hook.resetIndex();
+            this.draw(ctx, {
+                hook: this.hook,
             });
-            this.setState(newState);
         }
     }
 }
