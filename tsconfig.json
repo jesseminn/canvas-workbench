@@ -22,7 +22,10 @@
         "moduleResolution": "Node",
         "paths": {
             "~/*": ["*"],
-            "~lib/*": ["lib/*"]
+            "~lib/*": ["lib/*"],
+            "~canvas": ["lib/canvas/index.ts"],
+            "~utils/*": ["lib/utils/*"],
+            "~sketches/*": ["sketches/*"]
         },
 
         // # Advanced

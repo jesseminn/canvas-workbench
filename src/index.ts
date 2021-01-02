@@ -1,3 +1,3 @@
-import canvas from './sketches/generative-artistry/tiled-lines';
+import canvas from '~sketches/mdn-advanced-animations';
 
 canvas.render();

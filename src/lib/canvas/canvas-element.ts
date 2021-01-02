@@ -1,4 +1,4 @@
-import { Maybe, Callback } from '../types';
+import { Maybe, Callback } from '~lib/types';
 
 export type CanvasElementOptions<T> = {
     draw: Draw<T>;

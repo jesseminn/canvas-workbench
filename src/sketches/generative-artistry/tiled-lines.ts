@@ -1,5 +1,5 @@
-import { createGrid } from './../../lib/utils/number.utils';
-import { Canvas, CanvasElement } from '../../lib/canvas';
+import { Canvas, CanvasElement } from '~canvas';
+import { createGrid } from '~utils/number.utils';
 
 // https://generativeartistry.com/tutorials/tiled-lines/
 

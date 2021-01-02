@@ -1,6 +1,6 @@
-import { Maybe, Callback } from '../types';
-import { isNil } from '../utils/type.utils';
-import { CanvasElement } from './canvas-element';
+import { Maybe, Callback } from '~lib/types';
+import { isNil } from '~utils/type.utils';
+import { CanvasElement } from '~canvas';
 
 export type CanvasOptions = {
     width?: number;

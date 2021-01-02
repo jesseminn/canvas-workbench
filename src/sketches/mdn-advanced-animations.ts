@@ -1,5 +1,5 @@
-import { isInRange } from '../lib/utils/number.utils';
-import { Canvas, CanvasElement } from '../lib/canvas';
+import { isInRange } from '~utils/number.utils';
+import { Canvas, CanvasElement } from '~canvas';
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Advanced_animations
 
@@ -9,14 +9,14 @@ const canvas = new Canvas({
 });
 
 const element = new CanvasElement({
-    draw: (ctx, { hook: cache }) => {
+    draw: (ctx, { hook }) => {
         const canvas = ctx.canvas;
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;
-        const [vx, setVx] = cache.state(20);
-        const [vy, setVy] = cache.state(10);
-        const [x, setX] = cache.state(100);
-        const [y, setY] = cache.state(100);
+        const [vx, setVx] = hook.state(20);
+        const [vy, setVy] = hook.state(10);
+        const [x, setX] = hook.state(100);
+        const [y, setY] = hook.state(100);
 
         ctx.beginPath();
         ctx.arc(x, y, 50, 0, Math.PI * 2, true);

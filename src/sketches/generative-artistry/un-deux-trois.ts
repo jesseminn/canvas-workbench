@@ -1,4 +1,4 @@
-import { Canvas, CanvasElement } from '../../lib/canvas';
+import { Canvas, CanvasElement } from '~canvas';
 
 const canvas = new Canvas({
     width: 500,

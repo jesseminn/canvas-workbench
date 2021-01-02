@@ -1,4 +1,4 @@
-import { Callback } from '../types';
+import { Callback } from '~lib/types';
 
 type Range = [number, number];
 
