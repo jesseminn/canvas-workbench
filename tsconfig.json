@@ -24,6 +24,7 @@
             "~/*": ["*"],
             "~lib/*": ["lib/*"],
             "~canvas": ["lib/canvas/index.ts"],
+            "~hooks": ["lib/hooks/index.ts"],
             "~utils/*": ["lib/utils/*"],
             "~sketches/*": ["sketches/*"]
         },

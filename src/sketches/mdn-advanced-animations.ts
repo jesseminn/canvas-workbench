@@ -1,5 +1,6 @@
 import { isInRange } from '~utils/number.utils';
 import { Canvas, CanvasElement } from '~canvas';
+import { useMousePosition } from '~hooks';
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Advanced_animations
 
@@ -9,14 +10,14 @@ const canvas = new Canvas({
 });
 
 const element = new CanvasElement({
-    draw: (ctx, { hook }) => {
+    draw: (ctx, { hook: use }) => {
         const canvas = ctx.canvas;
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;
-        const [vx, setVx] = hook.state(20);
-        const [vy, setVy] = hook.state(10);
-        const [x, setX] = hook.state(100);
-        const [y, setY] = hook.state(100);
+        const [vx, setVx] = use.state(20);
+        const [vy, setVy] = use.state(10);
+        const [x, setX] = use.state(100);
+        const [y, setY] = use.state(100);
 
         ctx.beginPath();
         ctx.arc(x, y, 50, 0, Math.PI * 2, true);
@@ -44,15 +45,7 @@ const element2 = new CanvasElement({
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;
 
-        const [x, setX] = hook.state(100);
-        const [y, setY] = hook.state(100);
-
-        hook.memoize(() => {
-            canvas.addEventListener('mousemove', e => {
-                setX(e.offsetX);
-                setY(e.offsetY);
-            });
-        });
+        const { x, y } = useMousePosition(hook)({ x: 50, y: 100 });
 
         const drawCircle = hook.callback((cx: number, cy: number) => {
             ctx.beginPath();
