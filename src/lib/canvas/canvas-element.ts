@@ -1,4 +1,5 @@
 import { Maybe, Callback } from '~lib/types';
+import { compareArray } from '~utils/array.utils';
 
 export type CanvasElementOptions<T> = {
     draw: Draw<T>;
@@ -41,12 +42,33 @@ export class CanvasElementHook {
         return [state, setState];
     }
 
+    effect<T extends Function, U extends any[]>(callback: T, deps: U) {
+        const index = this.incrementIndex();
+        const registeredValue: { callback: T; deps: U; cleanup: Maybe<Callback> } = this.registry.get(index);
+        if (!registeredValue) {
+            // first run
+            const cleanup = callback();
+            this.registry.set(index, { callback, deps, cleanup });
+        } else {
+            const { deps: registeredDeps, cleanup: registeredCleanup } = registeredValue;
+            const isDepsChanged = !compareArray(deps, registeredDeps);
+            if (isDepsChanged) {
+                // 1. run cleanup
+                typeof registeredCleanup === 'function' && registeredCleanup();
+                // 2. run callback and save cleanup
+                const cleanup = callback();
+                // 3. update registry
+                this.registry.set(index, { callback, deps, cleanup });
+            }
+        }
+    }
+
     callback<T extends Function>(callback: T) {
         const [registeredValue] = this.register(callback);
         return registeredValue;
     }
 
-    memoize<R>(callback: Callback<R>) {
+    memo<R>(callback: Callback<R>) {
         const index = this.incrementIndex();
         if (this.registry.has(index)) {
             return this.registry.get(index);
