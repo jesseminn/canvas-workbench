@@ -14,10 +14,10 @@ const element = new CanvasElement({
         const canvas = ctx.canvas;
         const canvasWidth = canvas.width;
         const canvasHeight = canvas.height;
-        const [vx, setVx] = use.state(20);
-        const [vy, setVy] = use.state(10);
-        const [x, setX] = use.state(100);
-        const [y, setY] = use.state(100);
+        const [vx, setVx] = use.useState(20);
+        const [vy, setVy] = use.useState(10);
+        const [x, setX] = use.useState(100);
+        const [y, setY] = use.useState(100);
 
         ctx.beginPath();
         ctx.arc(x, y, 50, 0, Math.PI * 2, true);
@@ -47,7 +47,7 @@ const element2 = new CanvasElement({
 
         const { x, y } = useMousePosition(hook)({ x: 50, y: 100 });
 
-        const drawCircle = hook.callback((cx: number, cy: number) => {
+        const drawCircle = hook.useCallback((cx: number, cy: number) => {
             ctx.beginPath();
             ctx.arc(cx, cy, 50, 0, Math.PI * 2, true);
             ctx.closePath();

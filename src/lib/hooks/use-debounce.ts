@@ -3,9 +3,9 @@ import { CreateHook } from './types';
 type UseDebounce = <T>(value: T, delay: number) => T;
 
 export const useDebounce: CreateHook<UseDebounce> = use => (value, delay) => {
-    const [debouncedValue, setDebouncedValue] = use.state(value);
+    const [debouncedValue, setDebouncedValue] = use.useState(value);
 
-    use.effect(() => {
+    use.useEffect(() => {
         const timerId = setTimeout(() => {
             setDebouncedValue(value);
         }, delay);

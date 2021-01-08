@@ -9,6 +9,16 @@ export type CanvasElementContext = {
     hook: CanvasElementHook;
 };
 
+type Reducer<T, U = any> = (state: T, action: Action<U>) => T;
+
+type Dispatch<T = any> = (action: Action<T>) => void;
+
+type Action<T = any> = {
+    type: string;
+} & {
+    [x: string]: T;
+};
+
 export class CanvasElementHook {
     private registry = new Map<number, any>();
     private index = 0;
@@ -34,7 +44,7 @@ export class CanvasElementHook {
         this.index = 0;
     }
 
-    state<T>(initialState: T): [T, Callback] {
+    useState<T>(initialState: T): [T, Callback] {
         const [state, index] = this.register(initialState);
         const setState = <T>(newState: T) => {
             this.registry.set(index, newState);
@@ -42,7 +52,18 @@ export class CanvasElementHook {
         return [state, setState];
     }
 
-    effect<T extends Function, U extends any[]>(callback: T, deps: U) {
+    useReducer<T, U = any>(reducer: Reducer<T, U>, initialState: T) {
+        const [state, setState] = this.useState(initialState);
+
+        const dispatch: Dispatch<U> = action => {
+            const nextState = reducer(state, action);
+            setState(nextState);
+        };
+
+        return [state, dispatch];
+    }
+
+    useEffect<T extends Function, U extends any[]>(callback: T, deps: U) {
         const index = this.incrementIndex();
         const registeredValue: { callback: T; deps: U; cleanup: Maybe<Callback> } = this.registry.get(index);
         if (!registeredValue) {
@@ -63,12 +84,12 @@ export class CanvasElementHook {
         }
     }
 
-    callback<T extends Function>(callback: T) {
+    useCallback<T extends Function>(callback: T) {
         const [registeredValue] = this.register(callback);
         return registeredValue;
     }
 
-    memo<R>(callback: Callback<R>) {
+    useMemo<R>(callback: Callback<R>) {
         const index = this.incrementIndex();
         if (this.registry.has(index)) {
             return this.registry.get(index);
@@ -80,7 +101,6 @@ export class CanvasElementHook {
     }
 }
 
-// export type Draw<T> = (ctx: CanvasRenderingContext2D, state: Maybe<T>) => T;
 export type Draw<T> = (
     canvasRenderingContext2D: CanvasRenderingContext2D,
     canvasElementContext: CanvasElementContext,

@@ -15,7 +15,7 @@ const el = new CanvasElement({
 
         ctx.lineCap = 'square';
         ctx.lineWidth = 2;
-        const draw = hook.callback((x: number, y: number, width: number, height: number) => {
+        const draw = hook.useCallback((x: number, y: number, width: number, height: number) => {
             const isLeftToRight = Math.random() >= 0.5;
 
             if (isLeftToRight) {

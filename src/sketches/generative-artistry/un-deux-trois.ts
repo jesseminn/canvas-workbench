@@ -16,7 +16,7 @@ const el = new CanvasElement({
         const step = 20;
         const aThirdOfHeight = canvas.height / 3;
 
-        const draw = hook.callback((x: number, y: number, width: number, height: number, positions: number[]) => {
+        const draw = hook.useCallback((x: number, y: number, width: number, height: number, positions: number[]) => {
             ctx.save();
             ctx.translate(x + width / 2, y + height / 2);
             ctx.rotate(Math.random() * 5);
