@@ -1,4 +1,4 @@
-import { Callback } from '~lib/types';
+import { VariadicCallback } from '~lib/types';
 
 type Range = [number, number];
 
@@ -14,7 +14,13 @@ export const isInRange = (range: Range, n: number, isInclusive?: boolean) => {
     }
 };
 
-export const createGrid = (width: number, height: number, columns: number, rows: number, callback?: Callback) => {
+export const createGrid = (
+    width: number,
+    height: number,
+    columns: number,
+    rows: number,
+    callback?: VariadicCallback,
+) => {
     const col = width / columns;
     const row = height / rows;
 

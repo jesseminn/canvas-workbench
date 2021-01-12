@@ -30,7 +30,7 @@ const el = new CanvasElement({
             });
 
             ctx.restore();
-        });
+        }, []);
 
         for (var y = step; y < size - step; y += step) {
             for (var x = step; x < size - step; x += step) {

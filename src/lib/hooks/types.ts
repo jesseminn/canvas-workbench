@@ -1,3 +1,3 @@
-import { CanvasElementHook } from '~canvas';
+import { CanvasHook } from '~canvas';
 
-export type CreateHook<T> = (use: CanvasElementHook) => T;
+export type CreateHook<T> = (use: CanvasHook) => T;

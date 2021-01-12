@@ -26,7 +26,7 @@ const el = new CanvasElement({
                 ctx.lineTo(x, y + height);
             }
             ctx.stroke();
-        });
+        }, []);
 
         createGrid(size, size, step, step, draw);
     },
