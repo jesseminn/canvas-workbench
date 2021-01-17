@@ -1,5 +1,7 @@
 export type Maybe<T> = T | null | undefined;
 
+export type MaybeVoid<T> = T | null | undefined | void;
+
 export type NullaryFunction<R> = () => R;
 
 export type NullaryCallback = NullaryFunction<void>;
