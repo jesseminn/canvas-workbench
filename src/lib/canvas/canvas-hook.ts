@@ -35,12 +35,12 @@ export class CanvasHook {
     }
 
     private triggerStateUpdated = debounceIdle(() => {
-        this.debugger.debug('emitStateUpdated');
+        this.debugger.debug('triggerStateUpdated');
 
-        // Trigger callback of stateUpdated (should be render)
+        // Trigger callback of stateUpdated (should be render, sync)
         this.stateUpdated.emit();
 
-        // After render, triggers callback of afterStateUpdated (should be effects)
+        // After render, triggers callback of afterStateUpdated (should be effects, sync)
         this.afterStateUpdated.emit();
 
         // Lastly, reset registry index
@@ -48,7 +48,11 @@ export class CanvasHook {
     });
 
     private triggerFirstRenderEffect = debounceIdle(() => {
+        this.debugger.debug('triggerFirstRenderEffect');
+
         this.afterStateUpdated.emit();
+
+        this.resetRegistryIndex();
     });
 
     subscribeToStateUpdated(callback: NullaryCallback) {
@@ -68,8 +72,6 @@ export class CanvasHook {
 
             state = initialState;
             this.registry.set(index, initialState);
-
-            this.triggerFirstRenderEffect();
         } else {
             state = this.registry.get(index);
         }
@@ -114,29 +116,38 @@ export class CanvasHook {
         return state;
     }
 
-    useEffect<D extends any[]>(effect: Effect, deps: D) {
+    useEffect<D extends any[]>(effect: Effect, deps?: D) {
         const index = this.incrementRegistryIndex();
-        const registeredValue: EffectRegistry<D> = this.registry.get(index);
+        const isFirstRender = !this.registry.has(index);
 
         this.afterStateUpdated.subscribeOnce(() => {
-            if (!registeredValue) {
+            if (isFirstRender) {
                 // first run
+                // console.log('run effect: 1', effect);
                 const cleanup = effect();
+                // console.log('setting index', index, effect);
                 this.registry.set(index, { effect, deps, cleanup });
             } else {
+                const registeredValue: EffectRegistry<D> = this.registry.get(index);
                 const { deps: registeredDeps, cleanup: registeredCleanup } = registeredValue;
-                const isDepsChanged = !compareArray(deps, registeredDeps);
+                const shouldTriggerEffect = !Array.isArray(deps) || !compareArray(deps, registeredDeps);
 
-                if (isDepsChanged) {
+                if (shouldTriggerEffect) {
                     // 1. run cleanup
                     typeof registeredCleanup === 'function' && registeredCleanup();
                     // 2. run callback and save cleanup
+                    // console.log('run effect: 2', effect);
                     const cleanup = effect();
                     // 3. update registry
                     this.registry.set(index, { effect, deps, cleanup });
                 }
             }
         });
+
+        if (isFirstRender) {
+            // trigger first render
+            this.triggerFirstRenderEffect();
+        }
     }
 
     useCallback<T extends Function, U extends any[]>(callback: T, deps: U) {
