@@ -1,6 +1,6 @@
 import { isInRange } from '~utils/number.utils';
 import { Canvas, CanvasElement } from '~canvas';
-import { useMousePosition } from '~hooks';
+import { useMousePosition, useInterval } from '~hooks';
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Canvas_API/Tutorial/Advanced_animations
 
@@ -9,37 +9,50 @@ const canvas = new Canvas({
     height: 300,
 });
 
-const element = new CanvasElement({
-    draw: (ctx, { hook: use }) => {
+const bounce = new CanvasElement({
+    draw: (ctx, { hook }) => {
         const canvas = ctx.canvas;
-        const canvasWidth = canvas.width;
-        const canvasHeight = canvas.height;
-        const [vx, setVx] = use.useState(20);
-        const [vy, setVy] = use.useState(10);
-        const [x, setX] = use.useState(100);
-        const [y, setY] = use.useState(100);
+        // TODO: add an interface to get size with dip
+        const canvasWidth = canvas.width / window.devicePixelRatio;
+        const canvasHeight = canvas.height / window.devicePixelRatio;
+        const [vx, setVx] = hook.useState(20);
+        const [vy, setVy] = hook.useState(10);
+        const [x, setX] = hook.useState(50);
+        const [y, setY] = hook.useState(50);
 
-        ctx.beginPath();
-        ctx.arc(x, y, 50, 0, Math.PI * 2, true);
-        ctx.closePath();
-        ctx.fillStyle = 'blue';
-        ctx.fill();
+        const drawCircle = hook.useCallback((x: number, y: number) => {
+            ctx.beginPath();
+            ctx.arc(x, y, 50, 0, Math.PI * 2, true);
+            ctx.closePath();
+            ctx.fillStyle = 'blue';
+            ctx.fill();
+        }, []);
 
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
-        ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+        const clearCanvas = hook.useCallback(() => {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+        }, [canvasWidth, canvasHeight]);
 
-        const newX = x + vx;
-        const newY = y + vy;
-        const newVx = isInRange([canvasWidth, 0], newX) ? vx : -vx;
-        const newVy = isInRange([canvasHeight, 0], newY) ? vy : -vy;
-        setX(newX);
-        setY(newY);
-        setVx(newVx * 0.99);
-        setVy(newVy + 1);
+        useInterval(hook)(() => {
+            const newX = x + vx;
+            const newY = y + vy;
+            const isXInCanvas = isInRange([canvasWidth, 0], newX);
+            const isYInCanvas = isInRange([canvasHeight, 0], newY);
+            const newVx = isXInCanvas ? vx : -vx;
+            const newVy = isYInCanvas ? vy : -vy;
+            setX(newX);
+            setY(newY);
+            setVx(newVx * 0.99);
+            setVy(newVy + 1);
+        }, 1000 / 60);
+
+        // render
+        drawCircle(x, y);
+        clearCanvas();
     },
 });
 
-const element2 = new CanvasElement({
+const mouseMove = new CanvasElement({
     draw: (ctx, { hook }) => {
         const canvas = ctx.canvas;
         const canvasWidth = canvas.width;
@@ -62,6 +75,6 @@ const element2 = new CanvasElement({
     },
 });
 
-canvas.addElement(element2);
+canvas.addElement(mouseMove);
 
 export default canvas;
